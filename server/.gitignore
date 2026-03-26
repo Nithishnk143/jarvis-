@@ -1,0 +1,6 @@
+# IMPORTANT: Never commit env files
+.env
+.env.*
+
+node_modules/
+*.log

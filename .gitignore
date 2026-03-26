@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# Environment variables - NEVER commit these
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Misc build files
+build-*.txt
+build*.log
+built-*.txt
+lint*.txt
+lint*.json
+lintout.txt
+eslint*.txt
+eslint*.json
+eslint-*.txt
+eslint-results*

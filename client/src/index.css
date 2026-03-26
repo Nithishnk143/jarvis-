@@ -1,0 +1,292 @@
+/* =============================================
+   CareerCompass — Premium UI/UX Global CSS 
+   ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --transition-speed: 0.3s;
+
+  /* Sophisticated Portal Accent Colors */
+  --tenth-color:        #8B5CF6; /* Vibrant Purple */
+  --twelfth-color:      #10B981; /* Emerald Green */
+  --ug-color:           #0EA5E9; /* Ocean Blue */
+  --pg-color:           #F59E0B; /* Golden Amber */
+  --pro-color:          #F43F5E; /* Rose Red */
+
+  /* Light mode elegant defaults */
+  --body-bg:            #F8FAFC;
+  --card-bg:            #FFFFFF;
+  --sidebar-bg:         rgba(255, 255, 255, 0.85); /* For glass effect */
+  --sidebar-border:     rgba(0, 0, 0, 0.05);
+  --text-main:          #1E293B;
+  --text-muted-custom:  #64748B;
+  --card-shadow:        0 10px 40px -10px rgba(0,0,0,0.05);
+  --card-border:        rgba(0,0,0,0.03);
+}
+
+[data-bs-theme="dark"] {
+  --body-bg:            #09090B; /* True dark elegant background */
+  --card-bg:            #121214;
+  --sidebar-bg:         rgba(18, 18, 20, 0.85);
+  --sidebar-border:     rgba(255, 255, 255, 0.05);
+  --text-main:          #FAFAFA;
+  --text-muted-custom:  #A1A1AA;
+  --card-shadow:        0 10px 40px -10px rgba(0,0,0,0.3);
+  --card-border:        rgba(255, 255, 255, 0.05);
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--body-bg);
+  color: var(--text-main);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.015em;
+}
+
+/* ---------- Typography Overrides ---------- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: #3F3F46; }
+
+/* ---------- Layout & Navigation ---------- */
+.cc-layout { display: flex; min-height: 100vh; }
+
+.navbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--sidebar-bg) !important;
+  border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+.cc-sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--sidebar-border);
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.cc-main { flex: 1; overflow-x: hidden; padding: 1.5rem; }
+
+/* ---------- Sidebar Nav Links ---------- */
+.cc-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  color: var(--text-muted-custom);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+  margin: 4px 12px;
+  border: 1px solid transparent;
+}
+.cc-nav-link:hover { 
+  background: rgba(0,0,0,0.03); 
+  color: var(--text-main);
+  transform: translateX(4px);
+}
+.cc-nav-link.active { 
+  color: #fff !important; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+[data-bs-theme="dark"] .cc-nav-link:hover { background: rgba(255,255,255,0.03); }
+
+/* ---------- Portal Theme Active States ---------- */
+.portal-tenth  .cc-nav-link.active { background: linear-gradient(135deg, var(--tenth-color), #6D28D9); }
+.portal-twelfth .cc-nav-link.active { background: linear-gradient(135deg, var(--twelfth-color), #059669); }
+.portal-ug      .cc-nav-link.active { background: linear-gradient(135deg, var(--ug-color), #0284C7); }
+.portal-pg      .cc-nav-link.active { background: linear-gradient(135deg, var(--pg-color), #D97706); }
+.portal-pro     .cc-nav-link.active { background: linear-gradient(135deg, var(--pro-color), #E11D48); }
+
+/* ---------- Premium Cards ---------- */
+.cc-card {
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  background: var(--card-bg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.cc-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1); 
+  border-color: rgba(99, 102, 241, 0.2);
+}
+[data-bs-theme="dark"] .cc-card:hover {
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5); 
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------- Portal Hero Banners ---------- */
+.portal-banner {
+  border-radius: 24px;
+  padding: 40px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.portal-tenth .portal-banner   { background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important; }
+.portal-twelfth .portal-banner { background: linear-gradient(135deg, #10B981, #059669) !important; }
+.portal-ug .portal-banner      { background: linear-gradient(135deg, #0EA5E9, #0284C7) !important; }
+.portal-pg .portal-banner      { background: linear-gradient(135deg, #F59E0B, #D97706) !important; }
+.portal-professional .portal-banner { background: linear-gradient(135deg, #F43F5E, #E11D48) !important; }
+
+/* Abstract Glass Rings on Banners */
+.portal-banner::before, .portal-banner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.0));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.portal-banner::after {
+  top: -60px; right: -40px;
+  width: 250px; height: 250px;
+}
+.portal-banner::before {
+  bottom: -80px; left: 10%;
+  width: 150px; height: 150px;
+}
+
+/* ---------- Buttons & Inputs ---------- */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.2s ease;
+}
+.btn:active { transform: scale(0.97); }
+
+/* ---------- Quiz Stepper ---------- */
+.quiz-step-indicator {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+.quiz-step-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--sidebar-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.quiz-step-dot.active { background: currentColor; transform: scale(1.4); box-shadow: 0 0 10px currentColor; }
+.quiz-step-dot.done   { background: #10B981; }
+
+/* ---------- Roadmap Custom UI ---------- */
+.roadmap-step { display: flex; gap: 20px; position: relative; }
+.roadmap-step::before {
+  content: '';
+  position: absolute;
+  left: 23px; top: 48px; bottom: -24px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--sidebar-border), transparent);
+}
+.roadmap-step:last-child::before { display: none; }
+.roadmap-step-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  background: var(--card-bg);
+  border: 1px solid var(--sidebar-border);
+  z-index: 2;
+}
+.roadmap-step-body { flex: 1; padding-bottom: 32px; }
+
+/* ---------- Mentor Card & Badges ---------- */
+.mentor-avatar {
+  width: 72px; height: 72px;
+  border-radius: 20px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: #fff; font-weight: 800;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.cc-badge { 
+  border-radius: 8px; 
+  font-weight: 700; 
+  font-size: 0.70rem; 
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  text-transform: uppercase;
+}
+
+/* ---------- Stat Cards (Dashboard) ---------- */
+.stat-card {
+  border-radius: 20px;
+  padding: 24px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: transform 0.3s;
+}
+.stat-card:hover { transform: translateY(-5px); }
+.stat-card .stat-icon {
+  position: absolute;
+  right: -10px; bottom: -20px;
+  font-size: 6rem;
+  opacity: 0.15;
+  transform: rotate(-15deg);
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* ---------- Mobile Responsive ---------- */
+@media (max-width: 768px) {
+  .cc-sidebar { 
+    width: 100%; 
+    min-height: auto; 
+    position: relative; 
+    border-right: none; 
+    border-bottom: 1px solid var(--sidebar-border); 
+  }
+  .cc-layout { flex-direction: column; }
+  .portal-banner { padding: 24px; border-radius: 16px; }
+}

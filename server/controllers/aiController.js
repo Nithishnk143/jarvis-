@@ -1,3 +1,5 @@
+const { GoogleGenAI } = require('@google/genai');
+
 // AI Psychometric Evaluator
 const PROMPT_TEMPLATES = {
   tenth: `You are an expert career counselor. Analyze the following psychometric test answers for a 10th-grade student and recommend the best academic stream (Science, Commerce, or Arts).`,
@@ -44,28 +46,24 @@ const evaluatePsychometricTest = async (req, res) => {
       throw new Error('GEMINI_API_KEY is not configured on the server. Please add it to your Render environment variables.');
     }
 
-    // Call Google Gemini API (Using v1 stable endpoint and explicit model name)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: finalPrompt }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          responseMimeType: "application/json",
-        }
-      })
+    // Call Google Gemini using official SDK
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    
+    // Use the official, standard gemini-1.5-flash model mapping
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: finalPrompt,
+      config: {
+        temperature: 0.7,
+        responseMimeType: 'application/json',
+      }
     });
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(`Gemini API Error: ${errData.error?.message || response.statusText}`);
+    const aiTextResponse = response.text;
+    
+    if (!aiTextResponse || Object.keys(aiTextResponse).length === 0) {
+      throw new Error("Gemini API returned an empty response. Check if your API Key has access.");
     }
-
-    const aiData = await response.json();
-    const aiTextResponse = aiData.candidates[0].content.parts[0].text;
     
     // Parse the JSON string returned by Gemini
     let resultJson;

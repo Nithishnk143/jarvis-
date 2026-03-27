@@ -39,33 +39,41 @@ const evaluatePsychometricTest = async (req, res) => {
 
     const finalPrompt = `${basePrompt}\n\nHere are the student's answers to the psychometric test:\n${formattedAnswers}\n\n${JSON_SCHEMA}`;
 
-    const modelParam = process.env.AI_MODEL || 'llama3';
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured on the server. Please add it to your Render environment variables.');
+    }
 
-    // Call Local Ollama instance
-    const response = await fetch('http://localhost:11434/api/generate', {
+    // Call Google Gemini API
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: modelParam,
-        prompt: finalPrompt,
-        stream: false,
-        format: 'json'
+        contents: [{
+          parts: [{ text: finalPrompt }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          responseMimeType: "application/json",
+        }
       })
     });
 
     if (!response.ok) {
-      throw new Error('AI evaluation failed or Ollama is not running. Please ensure Ollama is active on port 11434.');
+      const errData = await response.json();
+      throw new Error(`Gemini API Error: ${errData.error?.message || response.statusText}`);
     }
 
     const aiData = await response.json();
+    const aiTextResponse = aiData.candidates[0].content.parts[0].text;
     
-    // Parse the JSON string returned by Ollama
+    // Parse the JSON string returned by Gemini
     let resultJson;
     try {
-      resultJson = JSON.parse(aiData.response);
+      resultJson = JSON.parse(aiTextResponse);
     } catch (parseError) {
       // Fallback cleanup if the LLM output markdown code blocks despite instructions
-      const cleanString = aiData.response.replace(/```json/g, '').replace(/```/g, '').trim();
+      const cleanString = aiTextResponse.replace(/```json/g, '').replace(/```/g, '').trim();
       resultJson = JSON.parse(cleanString);
     }
 

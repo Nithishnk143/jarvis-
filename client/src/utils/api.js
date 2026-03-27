@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const isProd = import.meta.env.MODE === 'production';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: isProd
+    ? 'https://jarvis-backend-e31w.onrender.com/api'
+    : (import.meta.env.VITE_API_URL || 'http://localhost:5001/api'),
   headers: { 'Content-Type': 'application/json' },
 });
 

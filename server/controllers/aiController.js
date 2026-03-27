@@ -39,13 +39,13 @@ const evaluatePsychometricTest = async (req, res) => {
 
     const finalPrompt = `${basePrompt}\n\nHere are the student's answers to the psychometric test:\n${formattedAnswers}\n\n${JSON_SCHEMA}`;
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim();
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY is not configured on the server. Please add it to your Render environment variables.');
     }
 
-    // Call Google Gemini API
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    // Call Google Gemini API (Using v1 stable endpoint and explicit model name)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

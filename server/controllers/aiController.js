@@ -53,9 +53,9 @@ const evaluatePsychometricTest = async (req, res) => {
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     
     // 4. Call Model
-    console.log('Calling gemini-1.5-flash model...');
+    console.log('Calling gemini-1.5-flash-latest model...');
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-flash-latest',
       contents: finalPrompt,
       config: {
         temperature: 0.7,
@@ -89,20 +89,28 @@ const evaluatePsychometricTest = async (req, res) => {
   } catch (err) {
     console.error('AI Error:', err);
     
-    let errorMessage = err.message;
-    // Attempt to parse GoogleGenAI JSON error strings
+    let errorMessage = err.message || 'An unexpected error occurred during AI evaluation.';
+    
+    // Attempt to extract error message from common SDK error formats
     try {
-      if (errorMessage && errorMessage.startsWith('{')) {
+      // Handle "ApiError: {"error":{...}}" format seen in logs
+      if (errorMessage.includes('{"error":')) {
+        const jsonPart = errorMessage.substring(errorMessage.indexOf('{'));
+        const parsed = JSON.parse(jsonPart);
+        if (parsed.error && parsed.error.message) {
+          errorMessage = parsed.error.message;
+        }
+      } else if (errorMessage.startsWith('{')) {
         const parsed = JSON.parse(errorMessage);
         if (parsed.error && parsed.error.message) {
           errorMessage = parsed.error.message;
         }
       }
     } catch (e) {
-      // Ignore parse error, use original message
+      console.log('Failed to parse error JSON, using raw message');
     }
     
-    res.status(500).json({ message: errorMessage || 'An unexpected error occurred during AI evaluation.' });
+    res.status(500).json({ message: errorMessage });
   }
 };
 

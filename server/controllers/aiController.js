@@ -52,8 +52,8 @@ const evaluatePsychometricTest = async (req, res) => {
     // 3. Call OpenRouter API
     console.log('Calling OpenRouter API...');
     
-    // We use a powerful but free model from OpenRouter
-    const OPENROUTER_MODEL = 'google/gemini-2.0-flash-lite-preview-02-05:free';
+    // We use a powerful free-tier model from OpenRouter
+    const OPENROUTER_MODEL = 'google/gemini-2.0-flash-001';
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",

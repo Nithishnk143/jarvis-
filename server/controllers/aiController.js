@@ -32,24 +32,28 @@ const evaluatePsychometricTest = async (req, res) => {
       return res.status(400).json({ message: 'Invalid test payload' });
     }
 
+    // 1. Validate environment
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim();
+    if (!GEMINI_API_KEY) {
+      console.error('CRITICAL: GEMINI_API_KEY is missing from environment variables.');
+      return res.status(500).json({ message: 'GEMINI_API_KEY is not configured on the server. Please add it to your Render environment variables.' });
+    }
+
+    // 2. Format student data
+    console.log('AI Evaluation Request for type:', userType);
     const basePrompt = PROMPT_TEMPLATES[userType] || PROMPT_TEMPLATES['twelfth'];
-    
-    // Format the user's answers into a readable string for the AI
     const formattedAnswers = answers
       .map((ans, idx) => `Q${idx + 1}: ${ans.question}\nAnswer: ${ans.selectedOption}`)
       .join('\n\n');
 
     const finalPrompt = `${basePrompt}\n\nHere are the student's answers to the psychometric test:\n${formattedAnswers}\n\n${JSON_SCHEMA}`;
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim();
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not configured on the server. Please add it to your Render environment variables.');
-    }
-
-    // Call Google Gemini using official SDK
+    // 3. Initialize SDK
+    console.log('Initializing GoogleGenAI SDK...');
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     
-    // Use the official, standard gemini-1.5-flash model mapping
+    // 4. Call Model
+    console.log('Calling gemini-1.5-flash model...');
     const response = await ai.models.generateContent({
       model: 'gemini-1.5-flash',
       contents: finalPrompt,
@@ -59,6 +63,7 @@ const evaluatePsychometricTest = async (req, res) => {
       }
     });
 
+    console.log('Raw response received from Gemini.');
     const aiTextResponse = response.text;
     
     if (!aiTextResponse || Object.keys(aiTextResponse).length === 0) {

@@ -83,7 +83,21 @@ const evaluatePsychometricTest = async (req, res) => {
 
   } catch (err) {
     console.error('AI Error:', err);
-    res.status(500).json({ message: err.message });
+    
+    let errorMessage = err.message;
+    // Attempt to parse GoogleGenAI JSON error strings
+    try {
+      if (errorMessage && errorMessage.startsWith('{')) {
+        const parsed = JSON.parse(errorMessage);
+        if (parsed.error && parsed.error.message) {
+          errorMessage = parsed.error.message;
+        }
+      }
+    } catch (e) {
+      // Ignore parse error, use original message
+    }
+    
+    res.status(500).json({ message: errorMessage || 'An unexpected error occurred during AI evaluation.' });
   }
 };
 

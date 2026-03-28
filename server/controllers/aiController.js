@@ -1,4 +1,5 @@
-const { GoogleGenAI } = require('@google/genai');
+// Remove Google SDK, use standard fetch for OpenRouter
+// OpenRouter is compatible with OpenAI-style requests.
 
 // AI Psychometric Evaluator
 const PROMPT_TEMPLATES = {
@@ -48,34 +49,53 @@ const evaluatePsychometricTest = async (req, res) => {
 
     const finalPrompt = `${basePrompt}\n\nHere are the student's answers to the psychometric test:\n${formattedAnswers}\n\n${JSON_SCHEMA}`;
 
-    // 3. Initialize SDK
-    console.log('Initializing GoogleGenAI SDK...');
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    // 3. Call OpenRouter API
+    console.log('Calling OpenRouter API...');
     
-    // 4. Call Model
-    console.log('Calling gemini-1.5-flash-latest model...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash-latest',
-      contents: finalPrompt,
-      config: {
-        temperature: 0.7,
-        responseMimeType: 'application/json',
-      }
+    // We use a powerful but free model from OpenRouter
+    const OPENROUTER_MODEL = 'google/gemini-2.0-flash-lite-preview-02-05:free';
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GEMINI_API_KEY}`,
+        "HTTP-Referer": "https://careercompass.com", // Optional, for OpenRouter analytics
+        "X-Title": "CareerCompass", // Optional
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "model": OPENROUTER_MODEL,
+        "messages": [
+          {
+            "role": "user",
+            "content": finalPrompt
+          }
+        ],
+        "response_format": { "type": "json_object" }
+      })
     });
 
-    console.log('Raw response received from Gemini.');
-    const aiTextResponse = response.text;
+    const data = await response.json();
+    console.log('OpenRouter response received.');
+
+    if (!response.ok) {
+      console.error('OpenRouter Error Data:', data);
+      const errorMsg = data.error?.message || `OpenRouter error: ${response.status}`;
+      return res.status(response.status).json({ message: errorMsg });
+    }
+
+    const aiTextResponse = data.choices?.[0]?.message?.content;
     
-    if (!aiTextResponse || Object.keys(aiTextResponse).length === 0) {
-      throw new Error("Gemini API returned an empty response. Check if your API Key has access.");
+    if (!aiTextResponse) {
+      throw new Error("OpenRouter returned an empty response.");
     }
     
-    // Parse the JSON string returned by Gemini
+    // Parse the JSON string
     let resultJson;
     try {
       resultJson = JSON.parse(aiTextResponse);
     } catch (parseError) {
-      // Fallback cleanup if the LLM output markdown code blocks despite instructions
+      // Fallback cleanup
       const cleanString = aiTextResponse.replace(/```json/g, '').replace(/```/g, '').trim();
       resultJson = JSON.parse(cleanString);
     }
@@ -88,29 +108,7 @@ const evaluatePsychometricTest = async (req, res) => {
 
   } catch (err) {
     console.error('AI Error:', err);
-    
-    let errorMessage = err.message || 'An unexpected error occurred during AI evaluation.';
-    
-    // Attempt to extract error message from common SDK error formats
-    try {
-      // Handle "ApiError: {"error":{...}}" format seen in logs
-      if (errorMessage.includes('{"error":')) {
-        const jsonPart = errorMessage.substring(errorMessage.indexOf('{'));
-        const parsed = JSON.parse(jsonPart);
-        if (parsed.error && parsed.error.message) {
-          errorMessage = parsed.error.message;
-        }
-      } else if (errorMessage.startsWith('{')) {
-        const parsed = JSON.parse(errorMessage);
-        if (parsed.error && parsed.error.message) {
-          errorMessage = parsed.error.message;
-        }
-      }
-    } catch (e) {
-      console.log('Failed to parse error JSON, using raw message');
-    }
-    
-    res.status(500).json({ message: errorMessage });
+    res.status(500).json({ message: err.message || 'An unexpected error occurred during AI evaluation.' });
   }
 };
 
